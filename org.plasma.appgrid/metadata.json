@@ -1,0 +1,19 @@
+{
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "butter-fly04"
+            }
+        ],
+        "Category": "Application Launchers",
+        "Description": "Fullscreen app grid launcher with custom ordering and groups",
+        "EnabledByDefault": true,
+        "Icon": "view-app-grid",
+        "Id": "org.plasma.appgrid",
+        "License": "GPL-2.0-or-later",
+        "Name": "App Grid Launcher",
+        "Version": "0.7.0"
+    },
+    "KPackageStructure": "Plasma/Applet",
+    "X-Plasma-API-Minimum-Version": "6.0"
+}
