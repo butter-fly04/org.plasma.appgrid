@@ -35,7 +35,7 @@ KCM.SimpleKCM {
     property string cfg_colorAccent
     property string cfg_colorAccentDefault
 
-    readonly property string format: "org.example.appgrid.settings"
+    readonly property string format: "org.plasma.appgrid.settings"
 
     property QtObject io: null
     property string ioError: ""

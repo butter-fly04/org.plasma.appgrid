@@ -66,7 +66,7 @@ PlasmoidItem {
         onRefreshed: main.refreshModel()
 
         Component.onCompleted: {
-            favoritesModel.initForClient("org.example.appgrid.favorites.instance-" + Plasmoid.id)
+            favoritesModel.initForClient("org.plasma.appgrid.favorites.instance-" + Plasmoid.id)
         }
     }
 

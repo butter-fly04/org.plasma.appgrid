@@ -10,9 +10,11 @@
         "EnabledByDefault": true,
         "Icon": "view-app-grid",
         "Id": "org.plasma.appgrid",
-        "License": "GPL-2.0-or-later",
+        "License": "GPL-3.0-or-later",
         "Name": "App Grid Launcher",
-        "Version": "0.7.0"
+        "Version": "0.7.0",
+        "Website": "https://github.com/butter-fly04/org.plasma.appgrid",
+        "BugReportUrl": "https://github.com/butter-fly04/org.plasma.appgrid/issues"
     },
     "KPackageStructure": "Plasma/Applet",
     "X-Plasma-API-Minimum-Version": "6.0"

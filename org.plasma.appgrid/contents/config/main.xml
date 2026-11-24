@@ -4,7 +4,7 @@
       xsi:schemaLocation="http://www.kde.org/standards/kcfg/1.0 http://www.kde.org/standards/kcfg/1.0/kcfg.xsd">
     <group name="General">
         <entry name="icon" type="String">
-            <default>view-app-grid</default>
+            <default>fedora-logo-icon</default>
         </entry>
         <!-- Our own layout store: JSON list of {type:"app",id} / {type:"group",name,items:[ids]}.
              Lives in this applet's config only; the system menu is never touched. -->
@@ -17,7 +17,7 @@
         </entry>
         <!-- "gnome" or "system" -->
         <entry name="theme" type="String">
-            <default>gnome</default>
+            <default>system</default>
         </entry>
         <!-- Icon size in px; 0 = automatic -->
         <entry name="iconSize" type="Int">
@@ -35,13 +35,13 @@
             <default>false</default>
         </entry>
         <entry name="colorBackdrop" type="String">
-            <default>#0a0a0a</default>
+            <default>#222226</default>
         </entry>
         <entry name="colorBackdropOpacity" type="Int">
-            <default>72</default>
+            <default>100</default>
         </entry>
         <entry name="colorPopup" type="String">
-            <default>#2e2e2e</default>
+            <default>#38383b</default>
         </entry>
         <entry name="colorText" type="String">
             <default>#ffffff</default>
