@@ -12,7 +12,7 @@
         "Id": "org.plasma.appgrid",
         "License": "GPL-3.0-or-later",
         "Name": "App Grid Launcher",
-        "Version": "0.7.0",
+        "Version": "0.7.1",
         "Website": "https://github.com/butter-fly04/org.plasma.appgrid",
         "BugReportUrl": "https://github.com/butter-fly04/org.plasma.appgrid/issues"
     },

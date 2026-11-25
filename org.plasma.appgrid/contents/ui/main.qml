@@ -106,15 +106,25 @@ PlasmoidItem {
         onTriggered: main.rebuild()
     }
 
+    // Plasma 6.6+ prefixes app ids from Kicker with "applications:". Store the bare
+    // desktop id so layouts and backups made with older Plasma versions keep working.
+    function normalizeId(id) {
+        return (typeof id === "string") ? id.replace(/^applications:/, "") : id
+    }
+
     function rebuild() {
         var map = {}, ids = []
         for (var i = 0; i < appRepeater.count; i++) {
             var it = appRepeater.itemAt(i)
-            if (!it || !it.favoriteId || map[it.favoriteId] !== undefined) {
+            if (!it || !it.favoriteId) {
                 continue
             }
-            map[it.favoriteId] = { name: it.display, icon: it.decoration, row: it.index }
-            ids.push(it.favoriteId)
+            var fid = normalizeId(it.favoriteId)
+            if (!fid || map[fid] !== undefined) {
+                continue
+            }
+            map[fid] = { name: it.display, icon: it.decoration, row: it.index }
+            ids.push(fid)
         }
         ids.sort(function (a, b) { return map[a].name.localeCompare(map[b].name) })
         appIndex = map
@@ -125,7 +135,7 @@ PlasmoidItem {
     }
 
     function launch(fid) {
-        var info = appIndex[fid]
+        var info = appIndex[normalizeId(fid)]
         if (info && appsModel) {
             appsModel.trigger(info.row, "", null)
         }
@@ -135,7 +145,17 @@ PlasmoidItem {
     function load() {
         try {
             var v = JSON.parse(Plasmoid.configuration.layoutJson)
-            layout = Array.isArray(v) ? v : []
+            layout = Array.isArray(v) ? v.map(function (e) {
+                if (!e || typeof e !== "object") {
+                    return e
+                }
+                if (e.type === "app") {
+                    e.id = normalizeId(e.id)
+                } else if (e.type === "group") {
+                    e.items = Array.isArray(e.items) ? e.items.map(normalizeId) : []
+                }
+                return e
+            }) : []
         } catch (e) {
             layout = []
         }
@@ -146,7 +166,12 @@ PlasmoidItem {
         try {
             var v = JSON.parse(Plasmoid.configuration.hiddenJson)
             if (Array.isArray(v)) {
-                v.forEach(function (id) { m[id] = true })
+                v.forEach(function (id) {
+                    var n = normalizeId(id)
+                    if (n) {
+                        m[n] = true
+                    }
+                })
             }
         } catch (e) {
             m = {}
@@ -155,7 +180,8 @@ PlasmoidItem {
     }
 
     function isShown(id) {
-        return appIndex[id] !== undefined && hiddenSet[id] !== true
+        var n = normalizeId(id)
+        return appIndex[n] !== undefined && hiddenSet[n] !== true
     }
 
     property string lastSaved: ""

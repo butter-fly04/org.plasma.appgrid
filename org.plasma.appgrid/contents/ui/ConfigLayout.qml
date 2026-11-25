@@ -43,6 +43,12 @@ KCM.SimpleKCM {
     Component.onCompleted: reload()
 
     // ---- data helpers --------------------------------------------------------------
+    // Plasma 6.6+ Kicker ids can be prefixed with "applications:"; keep the bare
+    // desktop id in this widget's config so old layouts and presets stay valid.
+    function baseId(id) {
+        return (typeof id === "string") ? id.replace(/^applications:/, "") : id
+    }
+
     function nameOf(id) {
         return catalog[id] ? catalog[id].name : id
     }
@@ -104,8 +110,12 @@ KCM.SimpleKCM {
         }
         var map = {}, ids = []
         for (var i = 0; i < cat.length; i++) {
-            map[cat[i].id] = cat[i]
-            ids.push(cat[i].id)
+            var cid = baseId(cat[i].id)
+            if (!cid || map[cid] !== undefined) {
+                continue
+            }
+            map[cid] = { id: cid, name: cat[i].name, icon: cat[i].icon }
+            ids.push(cid)
         }
         var saved = []
         try {
@@ -120,7 +130,12 @@ KCM.SimpleKCM {
         try {
             var hv = JSON.parse(cfg_hiddenJson)
             if (Array.isArray(hv)) {
-                hv.forEach(function (id) { h[id] = true })
+                hv.forEach(function (id) {
+                    var n = baseId(id)
+                    if (n) {
+                        h[n] = true
+                    }
+                })
             }
         } catch (e3) {
             h = {}
@@ -136,12 +151,13 @@ KCM.SimpleKCM {
         var placed = {}, out = []
         saved.forEach(function (e) {
             if (e.type === "app") {
-                if (map[e.id] && !placed[e.id]) {
-                    placed[e.id] = true
-                    out.push({ type: "app", id: e.id })
+                var id = baseId(e.id)
+                if (map[id] && !placed[id]) {
+                    placed[id] = true
+                    out.push({ type: "app", id: id })
                 }
             } else if (e.type === "group") {
-                var items = (e.items || []).filter(function (id) {
+                var items = (e.items || []).map(baseId).filter(function (id) {
                     if (!map[id] || placed[id]) {
                         return false
                     }

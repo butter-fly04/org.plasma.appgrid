@@ -36,6 +36,8 @@ KCM.SimpleKCM {
     property string cfg_colorAccentDefault
 
     readonly property string format: "org.plasma.appgrid.settings"
+    // Backups exported before the package was renamed still import normally.
+    readonly property string legacyFormat: "org.example.appgrid.settings"
 
     property QtObject io: null
     property string ioError: ""
@@ -44,15 +46,52 @@ KCM.SimpleKCM {
 
     readonly property string exportText: buildExport()
 
+    // Plasma 6.6+ Kicker ids can be prefixed with "applications:". Export and
+    // import the bare desktop id so presets work across Plasma versions.
+    function baseId(id) {
+        return (typeof id === "string") ? id.replace(/^applications:/, "") : id
+    }
+
+    function normalizeLayout(arr) {
+        if (!Array.isArray(arr)) {
+            return []
+        }
+        var out = []
+        arr.forEach(function (e) {
+            if (!e || typeof e !== "object") {
+                return
+            }
+            if (e.type === "app") {
+                var id = baseId(e.id)
+                if (typeof id === "string" && id.length > 0) {
+                    out.push({ type: "app", id: id })
+                }
+            } else if (e.type === "group" && Array.isArray(e.items)) {
+                out.push({
+                    type: "group",
+                    name: typeof e.name === "string" ? e.name : "Group",
+                    gid: typeof e.gid === "string" ? e.gid : undefined,
+                    items: e.items.map(baseId).filter(function (i) {
+                        return typeof i === "string" && i.length > 0
+                    })
+                })
+            }
+        })
+        return out
+    }
+
     function buildExport() {
         var lay = [], hid = []
         try {
-            lay = JSON.parse(cfg_layoutJson)
+            lay = normalizeLayout(JSON.parse(cfg_layoutJson))
         } catch (e) {
             lay = []
         }
         try {
             hid = JSON.parse(cfg_hiddenJson)
+            hid = Array.isArray(hid) ? hid.map(baseId).filter(function (id) {
+                return typeof id === "string" && id.length > 0
+            }) : []
         } catch (e2) {
             hid = []
         }
@@ -141,24 +180,14 @@ KCM.SimpleKCM {
             setStatus(false, "That isn't valid JSON: " + e.message)
             return
         }
-        if (!o || o.format !== format || !Array.isArray(o.layout)) {
+        if (!o || (o.format !== format && o.format !== legacyFormat) || !Array.isArray(o.layout)) {
             setStatus(false, "That isn't a settings export from this launcher.")
             return
         }
-        var lay = []
-        o.layout.forEach(function (e) {
-            if (e && e.type === "app" && typeof e.id === "string") {
-                lay.push({ type: "app", id: e.id })
-            } else if (e && e.type === "group" && Array.isArray(e.items)) {
-                lay.push({
-                    type: "group",
-                    name: String(e.name || "Group"),
-                    gid: typeof e.gid === "string" ? e.gid : undefined,
-                    items: e.items.filter(function (i) { return typeof i === "string" })
-                })
-            }
-        })
-        var hid = Array.isArray(o.hidden) ? o.hidden.filter(function (i) { return typeof i === "string" }) : []
+        var lay = normalizeLayout(o.layout)
+        var hid = Array.isArray(o.hidden) ? o.hidden.map(baseId).filter(function (i) {
+            return typeof i === "string" && i.length > 0
+        }) : []
         cfg_layoutJson = JSON.stringify(lay)
         cfg_hiddenJson = JSON.stringify(hid)
         cfg_theme = o.theme === "system" ? "system" : "gnome"

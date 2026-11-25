@@ -4,6 +4,16 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.1] - 2026-11-25
+
+### Fixed
+
+- Preserve saved layouts, groups and ordering on Plasma versions where Kicker
+  prefixes application ids with `applications:` (seen on Plasma 6.8).
+- Normalise app ids when loading the layout, publishing the app catalogue and
+  exporting or importing backups.
+- Accept backups saved with the legacy `org.example.appgrid.settings` format.
+
 ## [0.7.0] - 2026-11-24
 
 ### Added
